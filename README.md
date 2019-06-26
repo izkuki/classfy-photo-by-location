@@ -5,6 +5,9 @@ classfy photos from mobile phone by location in China which generated with GPS d
 
 采用中国国家地理中心的数据对行政区进行分类。精确到县，并针对长名称进行一定简化。
 
+map_data_new.json是数据文件
+findlocation.py是个测试，根据输入的GPS数据反查地名。
+
 对不同地区的招牌采取不同的分类方式。
 
 类型一：非本省区域，连续日期在同一城市，以月+市（含直辖市、港澳）为分类名称，比如“201812上海”，“201808辽宁大连”等。
