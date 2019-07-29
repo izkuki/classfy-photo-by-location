@@ -1,3 +1,10 @@
+2019-7-29 升级到V0.2版本
+修改：
+1 对分类后某一文件件内不到3张照片，对文件夹的名称用照片数进行标注，如“201807北京1”，便于后续手动剔除
+2 修改部分代码，现在只对JPG文件读取EXIF数据，其他文件只通过os模块读取文件路径和创建时间。
+
+
+
 # classfy-photo-by-location
 classfy photos from mobile phone by location in China which generated with GPS data from the EXIF information.  Put it into different directory.
 
