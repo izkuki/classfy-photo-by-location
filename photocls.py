@@ -10,10 +10,11 @@ import os
 import shutil
 import json
 import pandas as pd
+import time
 #sys.path.append(r'.\coordinate2address-master')
 
 #初始文件夹在这里
-path = r"D:\201808手机备份"
+path = r"D:\iphone备份201810"
 pathclassfy = path + "已整理"  #不把整理后的文件夹放在源文件夹之下是怕重复运行后重复分类
 
 #通过经纬度查地址函数
@@ -117,41 +118,45 @@ for root, dirs, files in os.walk(path):
             
             ffp = os.path.join(root,file) #ffp = full file path
             
-
+            #JPG文件读取exif数据，非JPG文件只读路径和创建时间
+            if ffp[-3:] == 'JPG' or ffp[-3:] == 'jpg': 
             
-            f = open(ffp, 'rb')
-            tags = exifread.process_file(f)
-            
-            latix = 0
-            longix = 0
-
-            #print(tags.keys())
-            if 'GPS GPSLatitude' in tags.keys():   #取纬度
-                lati = str(tags['GPS GPSLatitude'])
-                latix = gpstoint(lati)
-                #print(latix,end=' ')
+                f = open(ffp, 'rb')
+                tags = exifread.process_file(f)
                 
-            if 'GPS GPSLongitude' in tags.keys():    #取经度
-                longi = str(tags['GPS GPSLongitude'])
-                longix = gpstoint(longi)
-                #print(longix,end=' ')
-
-            if 'EXIF DateTimeOriginal' in tags.keys():    #取时间
-                photodate = str(tags['EXIF DateTimeOriginal'])
-                photodate = photodate[0:10]
-                #print(photodate)
-
-
-            if latix !=0 and longix !=0:
-                photo_location_data = findlocation(json_str,latix,longix)
-                photo_location_data['ffp'] = ffp
-                photo_location_data['date'] = photodate
-                #print(photo_location_data)
+                latix = 0
+                longix = 0
+    
+                #print(tags.keys())
+                if 'GPS GPSLatitude' in tags.keys():   #取纬度
+                    lati = str(tags['GPS GPSLatitude'])
+                    latix = gpstoint(lati)
+                    #print(latix,end=' ')
+                    
+                if 'GPS GPSLongitude' in tags.keys():    #取经度
+                    longi = str(tags['GPS GPSLongitude'])
+                    longix = gpstoint(longi)
+                    #print(longix,end=' ')
+    
+                if 'EXIF DateTimeOriginal' in tags.keys():    #取时间
+                    photodate = str(tags['EXIF DateTimeOriginal'])
+                    photodate = photodate[0:10]
+                    #print(photodate)
+    
+    
+                if latix !=0 and longix !=0:
+                    photo_location_data = findlocation(json_str,latix,longix)
+                    photo_location_data['ffp'] = ffp
+                    photo_location_data['date'] = photodate
+                    #print(photo_location_data)
+                else:
+                    photo_location_data['ffp'] = ffp
+                    photo_location_data['date'] = photodate                
+                
+                f.close()
             else:
                 photo_location_data['ffp'] = ffp
-                photo_location_data['date'] = photodate                
-            
-            f.close()
+                photo_location_data['date'] = time.strftime("%Y:%m:%d %X", time.localtime(os.path.getmtime(ffp)))
             #singledata = {}
             #建立新列表
             singledata = {}
@@ -215,7 +220,12 @@ for eachitem in groupedfile:
     
     print(eachitem['folder'],'共有',len(eachitem['filelist']),'个文件',end='')
     
-    destpath = pathclassfy + "\\" + eachitem['folder']
+    #把三个照片以下的文件夹标记出来，便于后续手动归集
+    if len(eachitem['filelist']) < 3:
+        destpath = pathclassfy + "\\" + eachitem['folder'] + str(len(eachitem['filelist']))
+    else:
+        destpath = pathclassfy + "\\" + eachitem['folder']
+        
     mkdir(destpath)
     
 
